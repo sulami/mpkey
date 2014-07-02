@@ -19,6 +19,10 @@ int main()
     if (xcb_connection_has_error((xcb = xcb_connect(NULL, &screen))))
         return -2;
 
+    /* disconnect again */
+    xcb_disconnect(xcb);
+    mpd_connection_free(mpd);
+
     return 0;
 }
 
