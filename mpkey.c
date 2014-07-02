@@ -19,9 +19,10 @@ static xcb_screen_t *xcb_screen_of_display(xcb_connection_t *con, int screen)
 
 int main()
 {
-    struct mpd_connection *mpd;
+    struct mpd_connection   *mpd;
     struct xcb_connection_t *xcb;
-    int screen;
+    int                     default_screen;
+    struct xcb_screen_t     *screen;
 
     /* connect to mpd */
     mpd = mpd_connection_new(HOST, PORT, TIMEOUT);
@@ -29,8 +30,11 @@ int main()
         return -1;
 
     /* connect to xcb */
-    if (xcb_connection_has_error((xcb = xcb_connect(NULL, &screen))))
+    if (xcb_connection_has_error((xcb = xcb_connect(NULL, &default_screen))))
         return -2;
+    screen = xcb_screen_of_display(xcb, default_screen);
+    if (!screen)
+        return -3;
 
     /* disconnect again */
     xcb_disconnect(xcb);
