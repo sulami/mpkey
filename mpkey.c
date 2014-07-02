@@ -10,10 +10,12 @@ int main()
     struct xcb_connection_t *xcb;
     int screen;
 
+    /* connect to mpd */
     mpd = mpd_connection_new(HOST, PORT, TIMEOUT);
     if (!mpd)
         return -1;
 
+    /* connect to xcb */
     if (xcb_connection_has_error((xcb = xcb_connect(NULL, &screen))))
         return -2;
 
