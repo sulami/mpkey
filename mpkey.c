@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdlib.h>
 #include <mpd/client.h>
 #include <xcb/xcb_keysyms.h>
@@ -21,25 +22,32 @@ int main()
 {
     struct mpd_connection   *mpd;
     struct xcb_connection_t *xcb;
-    int                     default_screen;
+    int                     default_screen, retval = 0;
     struct xcb_screen_t     *screen;
 
     /* connect to mpd */
     mpd = mpd_connection_new(HOST, PORT, TIMEOUT);
-    if (!mpd)
-        return -1;
+    if (!mpd) {
+        retval = -ENOMEM;
+        goto mpderror;
+    }
 
     /* connect to xcb */
-    if (xcb_connection_has_error((xcb = xcb_connect(NULL, &default_screen))))
-        return -2;
+    retval = xcb_connection_has_error(xcb = xcb_connect(NULL, &default_screen));
+    if (retval)
+        goto xcberror;
     screen = xcb_screen_of_display(xcb, default_screen);
-    if (!screen)
-        return -3;
+    if (!screen) {
+        retval = -EIO;
+        goto screenerror;
+    }
 
     /* disconnect again */
+screenerror:
     xcb_disconnect(xcb);
+xcberror:
     mpd_connection_free(mpd);
-
-    return 0;
+mpderror:
+    return retval;
 }
 
