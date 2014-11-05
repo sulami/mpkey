@@ -68,7 +68,7 @@ int main()
             xcb_key_press_event_t *ke = (xcb_key_press_event_t *)ev;
             for (unsigned int i = 0; i < LENGTH(hks); i++) {
                 if (SYMTOKEY(hks[i].key) == ke->detail) {
-                    /* do stuff */
+                    send_command(hks[i].command);
                 }
             }
         }

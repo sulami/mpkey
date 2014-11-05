@@ -9,5 +9,6 @@ typedef struct {
 
 static const HotKey hks[] = {
     { XK_p, "play" },
+    { XK_o, "stop" },
 };
 
