@@ -7,6 +7,8 @@
 
 #include "config.h"
 
+#define LENGTH(x) (sizeof(x)/sizeof(*x))
+
 static struct mpd_connection *mpd;
 static struct xcb_connection_t *xcb;
 static struct xcb_screen_t *screen;
@@ -57,7 +59,8 @@ int main()
     }
 
     /* grab the keys */
-    grab_keys(XK_j);
+    for (unsigned int i = 0; i < LENGTH(hks); i++)
+        grab_keys(hks[i].key);
 
     xcb_flush(xcb);
     while ((ev = xcb_wait_for_event(xcb))) {
