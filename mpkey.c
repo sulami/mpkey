@@ -8,10 +8,12 @@
 #include "config.h"
 
 #define LENGTH(x) (sizeof(x)/sizeof(*x))
+#define SYMTOKEY(k) *xcb_key_symbols_get_keycode(keysyms, k)
 
 static struct mpd_connection *mpd;
 static struct xcb_connection_t *xcb;
 static struct xcb_screen_t *screen;
+static xcb_key_symbols_t *keysyms;
 
 /* get screen of display */
 static xcb_screen_t *xcb_screen_of_display(xcb_connection_t *con, int screen)
@@ -26,14 +28,9 @@ static xcb_screen_t *xcb_screen_of_display(xcb_connection_t *con, int screen)
     return NULL;
 }
 
-static void grab_keys(xcb_keysym_t key)
+static void send_command(const char *command)
 {
-    xcb_key_symbols_t       *keysyms;
-
-    keysyms = xcb_key_symbols_alloc(xcb);
-    xcb_grab_key(xcb, true, screen->root, XCB_MOD_MASK_ANY,
-                 *xcb_key_symbols_get_keycode(keysyms, key),
-                 XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC);
+    mpd_send_command(mpd, command, NULL);
 }
 
 int main()
@@ -59,14 +56,21 @@ int main()
     }
 
     /* grab the keys */
+    keysyms = xcb_key_symbols_alloc(xcb);
     for (unsigned int i = 0; i < LENGTH(hks); i++)
-        grab_keys(hks[i].key);
+        xcb_grab_key(xcb, true, screen->root, XCB_MOD_MASK_ANY,
+                     SYMTOKEY(hks[i].key), XCB_GRAB_MODE_ASYNC,
+                     XCB_GRAB_MODE_ASYNC);
 
     xcb_flush(xcb);
     while ((ev = xcb_wait_for_event(xcb))) {
         if ((ev->response_type & ~0x80) == XCB_KEY_PRESS) {
-            printf("%s\n", "Works.");
-            /* xcb_key_press_event_t *ke = (xcb_key_press_event_t *)ev; */
+            xcb_key_press_event_t *ke = (xcb_key_press_event_t *)ev;
+            for (unsigned int i = 0; i < LENGTH(hks); i++) {
+                if (SYMTOKEY(hks[i].key) == ke->detail) {
+                    /* do stuff */
+                }
+            }
         }
         free(ev);
     }
