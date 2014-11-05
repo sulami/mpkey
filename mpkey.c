@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <mpd/client.h>
 #include <X11/keysym.h>
@@ -36,6 +37,7 @@ static void grab_keys(xcb_keysym_t key)
 int main()
 {
     int                     default_screen, retval = 0;
+    xcb_generic_event_t     *ev;
 
     /* connect to mpd */
     mpd = mpd_connection_new(HOST, PORT, TIMEOUT);
@@ -56,6 +58,15 @@ int main()
 
     /* grab the keys */
     grab_keys(XK_j);
+
+    xcb_flush(xcb);
+    while ((ev = xcb_wait_for_event(xcb))) {
+        if ((ev->response_type & ~0x80) == XCB_KEY_PRESS) {
+            printf("%s\n", "Works.");
+            /* xcb_key_press_event_t *ke = (xcb_key_press_event_t *)ev; */
+        }
+        free(ev);
+    }
 
     /* disconnect again */
 screenerror:
