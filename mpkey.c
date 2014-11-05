@@ -64,6 +64,7 @@ int main()
                      SYMTOKEY(hks[i].key), XCB_GRAB_MODE_ASYNC,
                      XCB_GRAB_MODE_ASYNC);
 
+    /* check for events and act accordingly */
     xcb_flush(xcb);
     while ((ev = xcb_wait_for_event(xcb))) {
         if ((ev->response_type & ~0x80) == XCB_KEY_PRESS) {
