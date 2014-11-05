@@ -6,6 +6,10 @@
 
 #include "config.h"
 
+static struct mpd_connection *mpd;
+static struct xcb_connection_t *xcb;
+static struct xcb_screen_t *screen;
+
 /* get screen of display */
 static xcb_screen_t *xcb_screen_of_display(xcb_connection_t *con, int screen)
 {
@@ -19,18 +23,19 @@ static xcb_screen_t *xcb_screen_of_display(xcb_connection_t *con, int screen)
     return NULL;
 }
 
-static void grab_keys(xcb_connection_t *con, xcb_screen_t *screen)
+static void grab_keys(xcb_keysym_t key)
 {
-    xcb_grab_key(con, 1, screen->root, XCB_MOD_MASK_ANY, XK_j,
+    xcb_key_symbols_t       *keysyms;
+
+    keysyms = xcb_key_symbols_alloc(xcb);
+    xcb_grab_key(xcb, true, screen->root, XCB_MOD_MASK_ANY,
+                 *xcb_key_symbols_get_keycode(keysyms, key),
                  XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC);
 }
 
 int main()
 {
-    struct mpd_connection   *mpd;
-    struct xcb_connection_t *xcb;
     int                     default_screen, retval = 0;
-    struct xcb_screen_t     *screen;
 
     /* connect to mpd */
     mpd = mpd_connection_new(HOST, PORT, TIMEOUT);
@@ -50,7 +55,7 @@ int main()
     }
 
     /* grab the keys */
-    grab_keys(xcb, screen);
+    grab_keys(XK_j);
 
     /* disconnect again */
 screenerror:
