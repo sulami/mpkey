@@ -6,8 +6,8 @@ A simple XCB-based hotkey manager for MPD
 
 Just run `make`.
 
-`libmpd-devel` and `libxcb-keysyms-devel` are required, the names vary
-depending onyour distro.
+`libmpdclient-devel` and `xcb-util-keysyms-devel` are required, the names vary
+depending on your distro.
 
 ## Configuration
 
