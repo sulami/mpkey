@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <mpd/client.h>
+#include <X11/keysym.h>
 #include <xcb/xcb_keysyms.h>
 
 #include "config.h"
@@ -16,6 +17,12 @@ static xcb_screen_t *xcb_screen_of_display(xcb_connection_t *con, int screen)
             return iter.data;
 
     return NULL;
+}
+
+static void grab_keys(xcb_connection_t *con, xcb_screen_t *screen)
+{
+    xcb_grab_key(con, 1, screen->root, XCB_MOD_MASK_ANY, XK_j,
+                 XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC);
 }
 
 int main()
@@ -41,6 +48,9 @@ int main()
         retval = -EIO;
         goto screenerror;
     }
+
+    /* grab the keys */
+    grab_keys(xcb, screen);
 
     /* disconnect again */
 screenerror:
