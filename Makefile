@@ -11,13 +11,14 @@ LDFLAGS += ${LIBS}
 
 EXEC = ${NAME}
 SRC = ${NAME}.c
+CFG = config.h
 OBJ = ${SRC:.c=.o}
 
 .c.o:
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $<
 
-${NAME}: ${OBJ}
+${NAME}: ${OBJ} ${CFG}
 	@echo CC -o $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
