@@ -18,9 +18,9 @@ OBJ = ${SRC:.c=.o}
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $<
 
-${OBJ}: $(DEPS)
-
 ${NAME}: ${OBJ}
 	@echo CC -o $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
+
+${OBJ}: $(DEPS)
 
