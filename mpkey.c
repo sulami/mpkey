@@ -30,7 +30,9 @@ static xcb_screen_t *xcb_screen_of_display(xcb_connection_t *con, int screen)
 
 static void send_command(const char *command)
 {
-    mpd_send_command(mpd, command, NULL);
+    if (!mpd_send_command(mpd, command, NULL) || !mpd_response_finish(mpd))
+        /* TODO maybe find out what happened? */
+        printf("error: something bad happened with mpd\n");
 }
 
 int main()
@@ -66,11 +68,9 @@ int main()
     while ((ev = xcb_wait_for_event(xcb))) {
         if ((ev->response_type & ~0x80) == XCB_KEY_PRESS) {
             xcb_key_press_event_t *ke = (xcb_key_press_event_t *)ev;
-            for (unsigned int i = 0; i < LENGTH(hks); i++) {
-                if (SYMTOKEY(hks[i].key) == ke->detail) {
+            for (unsigned int i = 0; i < LENGTH(hks); i++)
+                if (SYMTOKEY(hks[i].key) == ke->detail)
                     send_command(hks[i].command);
-                }
-            }
         }
         free(ev);
     }
