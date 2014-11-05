@@ -37,8 +37,8 @@ static void send_command(const char *command)
 
 int main()
 {
-    int                     default_screen, retval = 0;
-    xcb_generic_event_t     *ev;
+    int default_screen, retval = 0;
+    xcb_generic_event_t *ev;
 
     /* connect to mpd */
     mpd = mpd_connection_new(HOST, PORT, TIMEOUT);
