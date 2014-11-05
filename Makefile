@@ -10,15 +10,17 @@ CFLAGS += -std=c99 -pedantic -Wall -Wextra
 LDFLAGS += ${LIBS}
 
 EXEC = ${NAME}
+DEPS = config.h
 SRC = ${NAME}.c
-CFG = config.h
 OBJ = ${SRC:.c=.o}
 
 .c.o:
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $<
 
-${NAME}: ${OBJ} ${CFG}
+${OBJ}: $(DEPS)
+
+${NAME}: ${OBJ}
 	@echo CC -o $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
